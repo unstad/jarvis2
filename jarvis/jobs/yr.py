@@ -62,8 +62,9 @@ class Yr(AbstractJob):
     def _get_description(self, data):
         symbol = data['data']['next_1_hours']['summary']['symbol_code']
         # Remove any trailing time of day identifier: cloudy_night -> cloudy
-        symbol = symbol.split('_')[0]
-        return SYMBOL_TABLE[symbol]
+        #symbol = symbol.split('_')[0]
+        #return SYMBOL_TABLE[symbol]
+        return symbol
 
     def _baufort(self, wind_speed):  # noqa: C901
         if wind_speed < 0.3:
