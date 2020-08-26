@@ -5,16 +5,22 @@
   text-align: center;
 }
 [data-widget="yr2"] h1 {
-  font-size: 55px;
+  font-size: 42.5px;
   margin: 0;
-}
-[data-widget="yr2"] h2 {
-  font-size: 30px;
 }
 
 [data-widget="yr2"] table {
-  margin: 0 10px 0 10px;
+  margin: 0 8.5px 0 8.5px;
   text-align: left;
+  border-collapse: collapse;
+}
+
+[data-widget="yr2"] table.today tr:first-child {
+  font-weight: bolder;
+}
+
+[data-widget="yr2"] table td {
+  height: 23px;
 }
 
 [data-widget="yr2"] img {
