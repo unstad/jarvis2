@@ -1,0 +1,22 @@
+[data-widget="yr2"] {
+  height: 100%;
+  padding: 5px;
+  background: #81c6dd;
+  text-align: center;
+}
+[data-widget="yr2"] h1 {
+  font-size: 55px;
+  margin: 0;
+}
+[data-widget="yr2"] h2 {
+  font-size: 30px;
+}
+
+[data-widget="yr2"] table {
+  margin: 0 10px 0 10px;
+  text-align: left;
+}
+
+[data-widget="yr2"] img {
+  width: 20px;
+}

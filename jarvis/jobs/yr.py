@@ -145,6 +145,55 @@ class Yr(AbstractJob):
             'temperature': temperature,
             'wind': wind
         }
+    
+    def _find_forecast(self, data, date):
+        timeseries = data['properties']['timeseries']
+        date = date.replace(hour=12, minute=0, second=0, microsecond=0)
+        forecast = []
+        i = 0
+        while i < 7:
+            for ts in timeseries:
+                date_fmt = date.strftime('%Y-%m-%dT%H:%M:%SZ')
+                if ts['time'] != date_fmt:
+                    continue
+                forecast.append(ts)
+            date = date + timedelta(days=1)
+            i += 1
+        return forecast
+    
+    def _format_forcast(self, data):
+        forecast = []
+        for day in data:
+            week_day_n = datetime.strptime(day['time'], "%Y-%m-%dT%H:%M:%SZ").weekday()
+            week_day = self._get_week_day(week_day_n)
+            temperature = day['data']['instant']['details']['air_temperature']
+            symbol_code = day['data']['next_12_hours']['summary']['symbol_code']
+            day = [week_day, temperature, symbol_code]
+            forecast.append(day)
+        return forecast
+
+    def _get_week_day(self, day_n):
+        if day_n == 0:
+            return 'mandag'
+        elif day_n == 1:
+            return 'tirsdag'
+        elif day_n == 2:
+            return 'onsdag'
+        elif day_n == 3:
+            return 'torsdag'
+        elif day_n == 4:
+            return 'fredag'
+        elif day_n == 5:
+            return 'lørdag'
+        return 'søndag'
+
+
+    def _parse_week(self, data, date):
+        forecast_data = self._find_forecast(data, date)
+        forecast = self._format_forcast(forecast_data)
+        return {
+            'forecast': forecast
+        }
 
     def _parse(self, data, date=None):
         if date is None:
@@ -153,7 +202,8 @@ class Yr(AbstractJob):
         next_day = next_day.replace(hour=15)
         return {
             'today': self._parse_tree(data, date),
-            'tomorrow': self._parse_tree(data, next_day)
+            'tomorrow': self._parse_tree(data, next_day),
+            'week': self._parse_week(data, date)
         }
 
     def get(self):
