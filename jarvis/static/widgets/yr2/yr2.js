@@ -22,16 +22,28 @@ yr2.view = function (vnode) {
     return m("tr", [
       m("td", forecast.time.substr(11, 5)),
       m("td", forecast.data.instant.details.air_temperature + "°"),
-      m("img", {
-        src: yr2.formatDescription(
-          forecast.data.next_1_hours.summary.symbol_code
-        ),
-      }),
+      m(
+        "td",
+        m("img", {
+          src: yr2.formatDescription(
+            forecast.data.next_1_hours.summary.symbol_code
+          ),
+        })
+      ),
     ]);
   });
   return [
     m("p.fade", "Været i " + state.today.location),
-    m("h1", state.today.temperature + "°"),
+    m(
+      "header",
+      m(
+        "h1",
+        state.today.temperature + "°    ",
+        m("img.header", {
+          src: yr2.formatDescription(state.today.description),
+        })
+      )
+    ),
     m(
       "table.wrap",
       m("td", m("table.today", table_today)),

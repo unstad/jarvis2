@@ -4,9 +4,15 @@
   background: #81c6dd;
   text-align: center;
 }
+
+[data-widget="yr2"] p.fade {
+  margin-bottom: 0px;
+}
+
 [data-widget="yr2"] h1 {
   font-size: 42.5px;
   margin: 0;
+  height: 42.5px;
 }
 
 [data-widget="yr2"] table {
@@ -15,14 +21,20 @@
   border-collapse: collapse;
 }
 
-[data-widget="yr2"] table.today tr:first-child {
-  font-weight: bolder;
-}
-
 [data-widget="yr2"] table td {
   height: 23px;
 }
 
 [data-widget="yr2"] img {
   width: 20px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+[data-widget="yr2"] img.header {
+  height: 52px;
+  width: 52px;
+}
+[data-widget="yr2"] header {
+  margin: 10px;
 }

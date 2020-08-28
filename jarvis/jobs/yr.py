@@ -157,7 +157,6 @@ class Yr(AbstractJob):
         next_hours = []
         if date == datetime.now().replace(microsecond=0):
             next_hours = self._get_next_hours(data, date)
-        print(next_hours)
         return {
             'location': self.location,
             'description': description,
@@ -172,12 +171,12 @@ class Yr(AbstractJob):
         forecast = []
         i = 0
         while i < 7:
+            date = date + timedelta(days=1)
             for ts in timeseries:
                 date_fmt = date.strftime('%Y-%m-%dT%H:%M:%SZ')
                 if ts['time'] != date_fmt:
                     continue
                 forecast.append(ts)
-            date = date + timedelta(days=1)
             i += 1
         return forecast
     
