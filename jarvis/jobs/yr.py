@@ -56,16 +56,6 @@ class Yr(AbstractJob):
         self.timeout = conf.get('timeout')
         self.location = conf.get('location')
 
-    def _get_temperature(self, data):
-        return data['data']['instant']['details']['air_temperature']
-
-    def _get_description(self, data):
-        symbol = data['data']['next_1_hours']['summary']['symbol_code']
-        # Remove any trailing time of day identifier: cloudy_night -> cloudy
-        #symbol = symbol.split('_')[0]
-        #return SYMBOL_TABLE[symbol]
-        return symbol
-
     def _baufort(self, wind_speed):  # noqa: C901
         if wind_speed < 0.3:
             return 'Stille'
@@ -127,6 +117,18 @@ class Yr(AbstractJob):
             return 'lørdag'
         return 'søndag'
 
+    def _get_temperature(self, data):
+        return data['data']['instant']['details']['air_temperature']
+
+    def _get_description(self, data, symbol=None):
+        if symbol == None:
+            symbol = data['data']['next_1_hours']['summary']['symbol_code']
+        # Remove any trailing time of day identifier: cloudy_night -> cloudy
+        symbol_format = symbol.split('_')[0]
+        return {
+            'description': SYMBOL_TABLE[symbol_format], 
+            'symbol_code': symbol}
+
     def _get_wind(self, data):
         speed = data['data']['instant']['details']['wind_speed']
         direction = self._get_direction(
@@ -145,30 +147,21 @@ class Yr(AbstractJob):
             week_day_n = datetime.strptime(day['time'], "%Y-%m-%dT%H:%M:%SZ").weekday()
             week_day = self._get_week_day(week_day_n)
             temperature = day['data']['instant']['details']['air_temperature']
-            symbol_code = day['data']['next_12_hours']['summary']['symbol_code']
+            symbol_code = self._get_description(data, day['data']['next_12_hours']['summary']['symbol_code'])
             day = [week_day, temperature, symbol_code]
             forecast.append(day)
         return forecast
-   
-    def _get_next_hours(self, data, date):
-        forecast = []
-        i = 0
-        while i < 6:
-            date = date + timedelta(hours=1)
-            date_fmt = date.strftime('%Y-%m-%dT%H:%M:%SZ')
-            for d in data:
-                if d['time'] != date_fmt:
-                    continue
-                forecast.append(d)
-            i += 1
-        return forecast
   
-    def _find_forecast(self, data, date):
-        date = date.replace(hour=12)
+    def _find_forecast(self, data, date, next_hours=False):
+        if not next_hours:
+            date = date.replace(hour=12)
         forecast = []
         i = 0
         while i < 6:
-            date = date + timedelta(days=1)
+            if not next_hours:
+                date = date + timedelta(days=1)
+            else: 
+                date = date + timedelta(hours=1)
             date_fmt = date.strftime('%Y-%m-%dT%H:%M:%SZ')
             for d in data:
                 if d['time'] != date_fmt:
@@ -192,14 +185,12 @@ class Yr(AbstractJob):
             'forecast': forecast
         }
 
-    def _parse_tree(self, data, date):
+    def _parse_day(self, data, date):
         observation = self._find_observation(data, date)
         temperature = self._get_temperature(observation)
         description = self._get_description(observation)
         wind = self._get_wind(observation)
-        next_hours = []
-        if date == datetime.now().replace(minute=0, second=0 , microsecond=0):
-            next_hours = self._get_next_hours(data, date)
+        next_hours = self._find_forecast(data, date, True)
         return {
             'location': self.location,
             'description': description,
@@ -211,12 +202,9 @@ class Yr(AbstractJob):
     def _parse(self, data, date=None):
         if date is None:
             date = datetime.now().replace(minute=0, second=0, microsecond=0)
-        next_day = date + timedelta(days=1)
-        next_day = next_day.replace(hour=15)
         timeseries = data['properties']['timeseries']
         return {
-            'today': self._parse_tree(timeseries, date),
-            'tomorrow': self._parse_tree(timeseries, next_day),
+            'today': self._parse_day(timeseries, date),
             'week': self._parse_week(timeseries, date)
         }
 

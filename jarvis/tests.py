@@ -154,15 +154,12 @@ class Yr(unittest.TestCase):
         data = self.yr._parse(self.json, datetime(2020, 8, 17, 15))
         self.assertEqual('Trondheim', data['today']['location'])
         self.assertEqual(19.9, data['today']['temperature'])
-        self.assertEqual('Klarvær', data['today']['description'])
+        self.assertEqual('Klarvær', data['today']['description']['description'])
         self.assertEqual('nordvest', data['today']['wind']['direction'])
         self.assertEqual(2.8, data['today']['wind']['speed'])
 
-        self.assertEqual('Trondheim', data['tomorrow']['location'])
-        self.assertEqual(23.0, data['tomorrow']['temperature'])
-        self.assertEqual('Klarvær', data['tomorrow']['description'])
-        self.assertEqual('nordvest', data['tomorrow']['wind']['direction'])
-        self.assertEqual(2.2, data['tomorrow']['wind']['speed'])
+        self.assertEqual(23.2, data['week']['forecast'][0][1])
+        self.assertEqual('Lettskyet', data['week']['forecast'][0][2]['description'])
 
 
 class HackerNews(unittest.TestCase):

@@ -22,7 +22,10 @@ yr2.view = function (vnode) {
     return m("tr", [
       m("td", forecast[0]),
       m("td", forecast[1] + "°"),
-      m("td", m("img", { src: yr2.formatDescription(forecast[2]) })),
+      m(
+        "td",
+        m("img", { src: yr2.formatDescription(forecast[2].symbol_code) })
+      ),
     ]);
   });
   table_today = state.today.next_hours.map((forecast) => {
@@ -47,7 +50,7 @@ yr2.view = function (vnode) {
         "h1",
         state.today.temperature + "°    ",
         m("img.header", {
-          src: yr2.formatDescription(state.today.description),
+          src: yr2.formatDescription(state.today.description.symbol_code),
         })
       ),
       m("p.wind", yr.formatWind(state.today.wind))
